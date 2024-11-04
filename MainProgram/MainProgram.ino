@@ -5,23 +5,39 @@
  *
  * Author: Dhruba Saha
  * Version: 2.1.0
- * License: MIT
- */
+  */
 
 // Include the DHT11 library for interfacing with the sensor.
 #include <DHT11.h>
+
+// Moisture setup
+int rainPin = A0;
+int greenLED = 6;
+int redLED = 7;
+// you can adjust the threshold value
+int thresholdValue = 800;
+// Moisture end
 
 // Create an instance of the DHT11 class.
 // - For Arduino: Connect the sensor to Digital I/O Pin 2.
 DHT11 dht11(7);
 
 void setup() {
-    // Initialize serial communication to allow debugging and data readout.
-    // Using a baud rate of 9600 bps.
-    Serial.begin(9600);
-    
-    // Uncomment the line below to set a custom delay between sensor readings (in milliseconds).
-    // dht11.setDelay(500); // Set this to the desired delay. Default is 500ms.
+  
+  // Humidity
+  pinMode(rainPin, INPUT);
+  pinMode(greenLED, OUTPUT);
+  pinMode(redLED, OUTPUT);
+  digitalWrite(greenLED, LOW);
+  digitalWrite(redLED, LOW);
+  // Humidity end
+
+  // Initialize serial communication to allow debugging and data readout.
+  // Using a baud rate of 9600 bps.
+  Serial.begin(9600);
+  
+  // Uncomment the line below to set a custom delay between sensor readings (in milliseconds).
+  // dht11.setDelay(500); // Set this to the desired delay. Default is 500ms.
 }
 
 void loop() {
@@ -44,6 +60,24 @@ void loop() {
         // Print error message based on the error code.
         Serial.println(DHT11::getErrorString(result));
     }
-      Serial.println(analogRead(A0));
+    int sensorValue = analogRead(rainPin);
+  int p = map(sensorValue, 1023, 300, 0, 100);
+  Serial.print("The moisture value is: ");
+  Serial.println(p);
+  if(sensorValue < thresholdValue){
+    Serial.println(" - Doesn't need watering");
+    Serial.println("");
+    digitalWrite(redLED, LOW);
+    digitalWrite(greenLED, HIGH);
 
+  }
+  else {
+    Serial.println(" - Time to water your plant");
+    Serial.println("");
+    digitalWrite(redLED, HIGH);
+    digitalWrite(greenLED, LOW);
+
+  }
+  delay(500);
 }
+
