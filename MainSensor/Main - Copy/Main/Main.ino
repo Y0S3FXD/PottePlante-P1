@@ -21,9 +21,10 @@ int thresholdValue = 800;
 // Create an instance of the DHT11 class.
 // - For Arduino: Connect the sensor to Digital I/O Pin 2.
 DHT11 dht11(7);
+ int p_old = 0;
 
 void setup() {
-  
+ 
   // Humidity
   pinMode(rainPin, INPUT);
   pinMode(greenLED, OUTPUT);
@@ -47,24 +48,32 @@ void loop() {
     // Attempt to read the temperature and humidity values from the DHT11 sensor.
 
     int result = dht11.readTemperatureHumidity(temperature, humidity);
-
-    if (result == 0) {
-        
-        Serial.print(temperature);
-        Serial.print(",");
-        Serial.print(humidity);
-        Serial.print(",");
-    } else {
-        // Print error message based on the error code.
-        Serial.println(DHT11::getErrorString(result));
-    }
-
     int sensorValue = analogRead(rainPin);
     int p = map(sensorValue, 1023, 300, 0, 100);
+    
+    if (abs(p_old - p) <= 10 && p <= 100 ) { // forskel på 10 eller mere i %
+        if (result == 0) {
+            Serial.print(temperature);
+            Serial.print(",");
+            Serial.print(humidity);
+            Serial.print(",");
+            Serial.print(sensorValue);
+            Serial.print(",");
+            Serial.println(p);
+            p_old = p;
+        } else {
+            // Print error message based on the error code.
+            Serial.println(DHT11::getErrorString(result));
+        }
+    } else {
+      Serial.print(p);
+      Serial.println("%, Stor forskel"); // skal fjernes før der skal laves csv fil 
+      p_old = p;
+    }
 
-    Serial.println(p);
+    
 
   
-    delay(500);
+    delay(20);
 }
 
