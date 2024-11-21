@@ -3,7 +3,7 @@
 
 int main() {
     // Specify the COM port (adjust as needed, e.g., "COM5")
-    const char *comPortName = "\\\\.\\COM5";
+    const char *comPortName = "\\\\.\\COM3";
     HANDLE hSerial;
 
     // Open the serial port
@@ -51,17 +51,21 @@ int main() {
     // Buffer to store serial data
     char buffer[128];
     DWORD bytesRead;
-    
+
     // Read serial data and save it to the CSV file
     printf("Reading data from serial port...\n");
     while (1) {
         if (ReadFile(hSerial, buffer, sizeof(buffer) - 1, &bytesRead, NULL)) {
             buffer[bytesRead] = '\0';  // Null-terminate the string
             if (bytesRead > 0) {
-                printf("Data: %s", buffer);  // Print data for verification
+                // Remove any trailing newline characters from the buffer
+                char *newline = strpbrk(buffer, "\r\n");
+                if (newline) *newline = '\0';
 
-                // Write data to CSV file
-                fprintf(csvFile, "%s", buffer);
+                printf("Data: %s\n", buffer);  // Print data for verification
+
+                // Write data to CSV file with a single newline
+                fprintf(csvFile, "%s\n", buffer);
                 fflush(csvFile);  // Ensure data is written immediately
             }
         } else {
