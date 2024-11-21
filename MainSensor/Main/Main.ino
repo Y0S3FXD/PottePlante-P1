@@ -41,6 +41,7 @@ void setup() {
 }
 
 void loop() {
+    int i = 0;
     int temperature = 0;
     int humidity = 0;
 
