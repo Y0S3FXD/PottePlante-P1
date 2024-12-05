@@ -46,6 +46,7 @@ void loop() {
     int pMoisture = map(sensorValue, maxValue, minValue, 0, 100); // omregner til procent
     
     if (abs(pMoisture_old - pMoisture) <= 10 && pMoisture <= 100 ) { // forskel på 10 eller mere i %
+
         if (result == 0) {
             Serial.print(temperature);
             Serial.print(",");
@@ -68,6 +69,6 @@ void loop() {
     
 
   
-    delay(20);
+    delay(500);
 }
 
