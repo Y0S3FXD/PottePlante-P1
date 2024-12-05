@@ -6,7 +6,7 @@ void readFromComPort(const char *comPortName, const char *filename) {
     // Åbn COM-port
     HANDLE hSerial = CreateFile(comPortName, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (hSerial == INVALID_HANDLE_VALUE) {
-        printf("Kunne ikke åbne COM-porten.\n");
+        printf("Kunne ikke aabne COM-porten.\n");
         return;
     }
 
@@ -18,19 +18,22 @@ void readFromComPort(const char *comPortName, const char *filename) {
     char lineBuffer[256] = {0};
     int lineBufferPos = 0;
 
+    // Tæller til målinger
+    int measurementCount = 1;
+
     // Åbn en CSV-fil
     FILE *csvFile = fopen(filename, "w");
     if (csvFile == NULL) {
-        printf("Filen kunne ikke åbnes.\n");
+        printf("Filen kunne ikke aabnes.\n");
         CloseHandle(hSerial);
         return;
     }
 
     // Skriv header til CSV
-    fprintf(csvFile, "Temperature,Humidity,SoilMoisture\n");
+    fprintf(csvFile, "Measurement,Temperature,Humidity,SoilMoisture\n");
 
     // Læs data fra COM-port og skriv til CSV
-    printf("Læser data fra %s...\n", comPortName);
+    printf("Laeser data fra %s...\n", comPortName);
     while (1) {
         if (ReadFile(hSerial, buffer, sizeof(buffer) - 1, &bytesRead, NULL)) {
             if (bytesRead > 0) {
@@ -43,7 +46,7 @@ void readFromComPort(const char *comPortName, const char *filename) {
                         if (lineBufferPos > 0) {
                             lineBuffer[lineBufferPos] = '\0'; // Afslut linjen
                             printf("Data: %s\n", lineBuffer); // Udskriv data til konsollen
-                            fprintf(csvFile, "%s\n", lineBuffer); // Skriv data til CSV
+                            fprintf(csvFile, "%d,%s\n", measurementCount++, lineBuffer); // Skriv data til CSV med tæller
                             fflush(csvFile); // Sørg for, at data bliver skrevet til filen
                             lineBufferPos = 0; // Nulstil lineBuffer
                         }
@@ -54,7 +57,7 @@ void readFromComPort(const char *comPortName, const char *filename) {
                 }
             }
         } else {
-            printf("Fejl ved læsning fra COM-port\n");
+            printf("Fejl ved laesning fra COM-port\n");
             break;
         }
     }
