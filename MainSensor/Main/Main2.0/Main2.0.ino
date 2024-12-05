@@ -11,26 +11,20 @@
 #include <DHT11.h>
 
 // Moisture setup
-int rainPin = A0;
-int greenLED = 6;
-int redLED = 7;
-// you can adjust the threshold value
-int thresholdValue = 800;
+int moisturePin = A0;
+int maxValue = 1023;
+int minValue = 300;
 // Moisture end
 
 // Create an instance of the DHT11 class.
 // - For Arduino: Connect the sensor to Digital I/O Pin 2.
 DHT11 dht11(7);
- int p_old = 0;
+ int pMoisture_old = 0;
 
 void setup() {
  
   // Humidity
-  pinMode(rainPin, INPUT);
-  pinMode(greenLED, OUTPUT);
-  pinMode(redLED, OUTPUT);
-  digitalWrite(greenLED, LOW);
-  digitalWrite(redLED, LOW);
+  pinMode(moisturePin, INPUT);
   // Humidity end
 
   // Initialize serial communication to allow debugging and data readout.
@@ -48,27 +42,27 @@ void loop() {
     // Attempt to read the temperature and humidity values from the DHT11 sensor.
 
     int result = dht11.readTemperatureHumidity(temperature, humidity);
-    int sensorValue = analogRead(rainPin);
-    int p = map(sensorValue, 1023, 300, 0, 100);
+    int sensorValue = analogRead(moisturePin);
+    int pMoisture = map(sensorValue, maxValue, minValue, 0, 100); // omregner til procent
     
-    if (abs(p_old - p) <= 10 && p <= 100 ) { // forskel på 10 eller mere i %
+    if (abs(pMoisture_old - pMoisture) <= 10 && pMoisture <= 100 ) { // forskel på 10 eller mere i %
         if (result == 0) {
             Serial.print(temperature);
             Serial.print(",");
             Serial.print(humidity);
             Serial.print(",");
-            Serial.print(sensorValue);
-            Serial.print(",");
-            Serial.println(p);
-            p_old = p;
+            // Serial.print(sensorValue);
+            // Serial.print(",");
+            Serial.println(pMoisture);
+            pMoisture_old = pMoisture;
         } else {
             // Print error message based on the error code.
             Serial.println(DHT11::getErrorString(result));
         }
     } else {
-      Serial.print(p);
-      Serial.println("%, Stor forskel"); // skal fjernes før der skal laves csv fil 
-      p_old = p;
+      // Serial.print(pMoisture);
+      // Serial.println("%, Stor forskel"); // skal fjernes før der skal laves csv fil 
+      pMoisture_old = pMoisture;
     }
 
     
