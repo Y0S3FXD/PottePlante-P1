@@ -1,12 +1,3 @@
-/**
- * DHT11 Sensor Reader
- * This sketch reads temperature and humidity data from the DHT11 sensor and prints the values to the serial port.
- * It also handles potential error states that might occur during reading.
- *
- * Author: Dhruba Saha
- * Version: 2.1.0
-  */
-
 // Include the DHT11 library for interfacing with the sensor.
 #include <DHT11.h>
 
@@ -14,14 +5,13 @@
 int moisturePin = A0;
 int maxValue = 1023;
 int minValue = 300;
+int pMoistureOld = 0;
 
 // Create an instance of the DHT11 class.
 // - For Arduino: Connect the sensor to Digital I/O Pin 7.
 DHT11 dht11(7);
- int pMoistureOld = 0;
 
 void setup() {
- 
   // Humidity
   pinMode(moisturePin, INPUT);
 
