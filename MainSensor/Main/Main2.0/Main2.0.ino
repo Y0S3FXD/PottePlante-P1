@@ -14,25 +14,19 @@
 int moisturePin = A0;
 int maxValue = 1023;
 int minValue = 300;
-// Moisture end
 
 // Create an instance of the DHT11 class.
-// - For Arduino: Connect the sensor to Digital I/O Pin 2.
+// - For Arduino: Connect the sensor to Digital I/O Pin 7.
 DHT11 dht11(7);
- int pMoisture_old = 0;
+ int pMoistureOld = 0;
 
 void setup() {
  
   // Humidity
   pinMode(moisturePin, INPUT);
-  // Humidity end
 
-  // Initialize serial communication to allow debugging and data readout.
-  // Using a baud rate of 9600 bps.
   Serial.begin(9600);
   
-  // Uncomment the line below to set a custom delay between sensor readings (in milliseconds).
-  // dht11.setDelay(500); // Set this to the desired delay. Default is 500ms.
 }
 
 void loop() {
@@ -45,7 +39,7 @@ void loop() {
     int sensorValue = analogRead(moisturePin);
     int pMoisture = map(sensorValue, maxValue, minValue, 0, 100); // omregner til procent
     
-    if (abs(pMoisture_old - pMoisture) <= 10 && pMoisture <= 100 ) { // forskel på 10 eller mere i %
+    if (abs(pMoistureOld - pMoisture) <= 10 && pMoisture <= 100 ) { // forskel på 10 eller mere i %
 
         if (result == 0) {
             Serial.print(temperature);
@@ -55,7 +49,7 @@ void loop() {
             // Serial.print(sensorValue);
             // Serial.print(",");
             Serial.println(pMoisture);
-            pMoisture_old = pMoisture;
+            pMoistureOld = pMoisture;
         } else {
             // Print error message based on the error code.
             Serial.println(DHT11::getErrorString(result));
@@ -63,7 +57,7 @@ void loop() {
     } else {
       // Serial.print(pMoisture);
       // Serial.println("%, Stor forskel"); // skal fjernes før der skal laves csv fil 
-      pMoisture_old = pMoisture;
+      pMoistureOld = pMoisture;
     }
 
     
