@@ -3,10 +3,66 @@
 #include <windows.h>
 #include <string.h>
 
+
+void readFromUsbPort(const char *usbPort3, const char *plantData);
+void createGnuplotScript(const char *plantData, const char *datafile, int column, const char *title);
+
+int main(void) {
+    const char *usbPort3 = "\\\\.\\COM3"; // COM port name
+    const char *plantData = "plant_data.csv"; // CSV file name
+    const char *gnuplotData = "data.tmp"; // Temporary data file for gnuplot
+
+    readFromUsbPort(usbPort3, plantData);
+
+    // Open the CSV file
+    FILE *csvFile = fopen(plantData, "r");
+    if (csvFile == NULL) {
+        printf("Error opening CSV file");
+        return 1;
+    }
+
+    // Open a temporary file to store data for gnuplot
+    FILE *fp = fopen(gnuplotData, "w");
+    if (fp == NULL) {
+        printf("Error creating temporary data file");
+        fclose(csvFile);
+        return 1;
+    }
+
+    // Skip the header line in the CSV file
+    char line[64]; // Previously 256, arbitrary number for the length of a line in CSV file
+    fgets(line, sizeof(line), csvFile); // Read and ignore the header
+
+    // Read and write each line to the temporary file
+    int measurement;
+    float temperature, humidity, soilMoisture;
+    while (fgets(line, sizeof(line), csvFile)) {
+        if (sscanf(line, "%d,%f,%f,%f", &measurement, &temperature, &humidity, &soilMoisture) == 4) {
+            fprintf(fp, "%d %f %f %f\n", measurement, temperature, humidity, soilMoisture);
+        }
+    }
+
+    fclose(csvFile);
+    fclose(fp);
+
+    // Create gnuplot scripts for each plot
+    createGnuplotScript("temperature.gnu", gnuplotData, 2, "Temperature (°C)");
+    createGnuplotScript("humidity.gnu", gnuplotData, 3, "Humidity (%)");
+    createGnuplotScript("soil_moisture.gnu", gnuplotData, 4, "Soil Moisture (%)");
+
+    // Execute gnuplot for each script
+    system("gnuplot -persistent temperature.gnu");
+    system("gnuplot -persistent humidity.gnu");
+    system("gnuplot -persistent soil_moisture.gnu");
+
+    return 0;
+}
+
+
 // Function to read data from COM port and save it to a CSV file
-void readFromComPort(const char *comPortName, const char *filename) {
+void readFromUsbPort(const char *usbPort3, const char *plantData) {
     // Open COM port
-    HANDLE hSerial = CreateFile(comPortName, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+    HANDLE hSerial = CreateFile(usbPort3, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (hSerial == INVALID_HANDLE_VALUE) {
         printf("Could not open COM port.\n");
         return;
@@ -24,7 +80,7 @@ void readFromComPort(const char *comPortName, const char *filename) {
     int measurementCount = 1;
 
     // Open the CSV file
-    FILE *csvFile = fopen(filename, "w");
+    FILE *csvFile = fopen(plantData, "w");
     if (csvFile == NULL) {
         printf("Could not open file.\n");
         CloseHandle(hSerial);
@@ -35,7 +91,7 @@ void readFromComPort(const char *comPortName, const char *filename) {
     fprintf(csvFile, "Measurement,Temperature,Humidity,SoilMoisture\n");
 
     // Read data from COM port and write to CSV
-    printf("Reading data from %s...\n", comPortName);
+    printf("Reading data from %s...\n", usbPort3);
     while (1) {
         if (ReadFile(hSerial, buffer, sizeof(buffer) - 1, &bytesRead, NULL)) {
             if (bytesRead > 0) {
@@ -71,10 +127,10 @@ void readFromComPort(const char *comPortName, const char *filename) {
 }
 
 // Function to create a gnuplot script
-void createGnuplotScript(const char *filename, const char *datafile, int column, const char *title) {
-    FILE *script = fopen(filename, "w");
+void createGnuplotScript(const char *plantData, const char *datafile, int column, const char *title) {
+    FILE *script = fopen(plantData, "w");
     if (!script) {
-        perror("Error creating gnuplot script");
+        printf("Error creating gnuplot script");
         exit(1);
     }
     fprintf(script, "set title \"%s\"\n", title);
@@ -85,55 +141,4 @@ void createGnuplotScript(const char *filename, const char *datafile, int column,
     fclose(script);
 }
 
-// Main function
-int main(void) {
-    const char *comPortName = "\\\\.\\COM3"; // COM port name
-    const char *filename = "plant_data.csv"; // CSV file name
-    const char *dataFile = "data.tmp"; // Temporary data file for gnuplot
 
-    // Read data from COM port
-    readFromComPort(comPortName, filename);
-
-    // Open the CSV file
-    FILE *csvFile = fopen(filename, "r");
-    if (csvFile == NULL) {
-        perror("Error opening CSV file");
-        return 1;
-    }
-
-    // Open a temporary file to store parsed data for gnuplot
-    FILE *fp = fopen(dataFile, "w");
-    if (fp == NULL) {
-        perror("Error creating temporary data file");
-        fclose(csvFile);
-        return 1;
-    }
-
-    // Skip the header line in the CSV file
-    char line[256];
-    fgets(line, sizeof(line), csvFile); // Read and ignore the header
-
-    // Read and write each line to the temporary file
-    int measurement;
-    float temperature, humidity, soilMoisture;
-    while (fgets(line, sizeof(line), csvFile)) {
-        if (sscanf(line, "%d,%f,%f,%f", &measurement, &temperature, &humidity, &soilMoisture) == 4) {
-            fprintf(fp, "%d %f %f %f\n", measurement, temperature, humidity, soilMoisture);
-        }
-    }
-
-    fclose(csvFile);
-    fclose(fp);
-
-    // Create gnuplot scripts for each plot
-    createGnuplotScript("temperature.gnu", dataFile, 2, "Temperature (°C)");
-    createGnuplotScript("humidity.gnu", dataFile, 3, "Humidity (%)");
-    createGnuplotScript("soil_moisture.gnu", dataFile, 4, "Soil Moisture (%)");
-
-    // Execute gnuplot for each script
-    system("gnuplot -persistent temperature.gnu");
-    system("gnuplot -persistent humidity.gnu");
-    system("gnuplot -persistent soil_moisture.gnu");
-
-    return 0;
-}
