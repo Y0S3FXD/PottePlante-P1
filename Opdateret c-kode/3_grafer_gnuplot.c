@@ -4,7 +4,7 @@
 void createGnuplotScript(const char *filename, const char *datafile, int column, const char *title, const char *output) {
     FILE *script = fopen(filename, "w");
     if (!script) {
-        perror("Error creating gnuplot script");
+        printf("Error creating gnuplot script");
         exit(1);
     }
     fprintf(script, "set title \"%s\"\n", title);
@@ -21,14 +21,14 @@ int main(void) {
     // Open the CSV file
     FILE *csvFile = fopen("plant_data.csv", "r");
     if (csvFile == NULL) {
-        perror("Error opening CSV file");
+        printf("Error opening CSV file");
         return 1;
     }
 
     // Open a temporary file to store parsed data for gnuplot
     fp = fopen("data.tmp", "w");
     if (fp == NULL) {
-        perror("Error creating temporary data file");
+        printf("Error creating temporary data file");
         fclose(csvFile);
         return 1;
     }

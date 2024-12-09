@@ -16,14 +16,14 @@ int main(void) {
     // Open the CSV file
     FILE *csvFile = fopen("plant_data1.csv", "r");
     if (csvFile == NULL) {
-        perror("Error opening CSV file");
+        printf("Error opening CSV file");
         return 1;
     }
 
     // Open a temporary file to store parsed data for gnuplot
     fp = fopen("data.tmp", "w");
     if (fp == NULL) {
-        perror("Error creating temporary data file");
+        printf("Error creating temporary data file");
         fclose(csvFile);
         return 1;
     }
@@ -47,7 +47,7 @@ int main(void) {
     // Open a pipe to gnuplot
     gnupipe = _popen("gnuplot -persistent", "w");
     if (gnupipe == NULL) {
-        perror("Error opening gnuplot");
+        printf("Error opening gnuplot");
         return 1;
     }
 

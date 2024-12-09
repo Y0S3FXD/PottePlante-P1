@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <string.h>
 
-void readFromComPort(const char *comPortName, const char *filename) {
+void readFromUsbPort(const char *comPortName, const char *filename) {
     // Åbn COM-port
     HANDLE hSerial = CreateFile(comPortName, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (hSerial == INVALID_HANDLE_VALUE) {
@@ -72,6 +72,6 @@ int main(void) {
     const char *comPortName = "\\\\.\\COM3"; // COM-portnavn
     const char *filename = "plant_data.csv"; // CSV-filnavn
 
-    readFromComPort(comPortName, filename);
+    readFromUsbPort(comPortName, filename);
     return 0;
 }
