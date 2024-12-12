@@ -42,5 +42,5 @@ void loop() {
       // Serial.println("%, Stor forskel"); // skal fjernes før der skal laves csv fil 
       pMoistureOld = pMoisture;
     }
-    delay(500);
+    delay(120000);
 }
