@@ -8,7 +8,7 @@ void readFromUsbPort(const char *usbPort3, const char *plantData);
 void createGnuplotScript(const char *gnuplotScriptName, const char *datafile, int column, const char *title);
 
 int main(void) {
-    const char *usbPort3 = "\\\\.\\COM3";       // COM port name
+    const char *usbPort3 = "\\\\.\\COM5";       // COM port name
     const char *plantData = "plant_data.csv";   // CSV file name
     const char *gnuplotData = "data.tmp";       // Temporary data file for gnuplot
 
