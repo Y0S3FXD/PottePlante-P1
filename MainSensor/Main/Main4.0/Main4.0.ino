@@ -85,6 +85,6 @@ void loop() {
       WiFiDrv::analogWrite(26, 255); // green on
     }
     
-    delay(2000);
+    delay(600000);
 }
 
