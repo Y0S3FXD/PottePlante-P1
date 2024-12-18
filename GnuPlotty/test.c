@@ -8,13 +8,13 @@ int main(void) {
         "set title \"Plant Data Over Two Weeks\"",
         "set xlabel \"Measurement Number\"",
         "set ylabel \"Values\"",
-        "plot 'data.tmp' using 1:2 with lines title 'Soil Moisture (%)', "
+        "plot 'data.tmp' using 1:2 with lines title 'Temperature (C)', "
         "'data.tmp' using 1:3 with lines title 'Humidity (%)', "
-        "'data.tmp' using 1:4 with lines title 'Temperature (C)'"
+        "'data.tmp' using 1:4 with lines title 'Soil Moisture (%)'"
     };
 
     // Open the CSV file
-    FILE *csvFile = fopen("plant_data1.csv", "r");
+    FILE *csvFile = fopen("plant_data.csv", "r");
     if (csvFile == NULL) {
         printf("Error opening CSV file");
         return 1;
