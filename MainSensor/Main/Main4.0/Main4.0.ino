@@ -11,7 +11,7 @@ int pMoisture_old = 0;
 // Moisture end
 
 int moistureThreshold = 40; // Threshold below which the plant needs water
-int soilMax = 48; // soilmusture above 90 = stop watering
+int soilMax = 90; // soilmusture above 90 = stop watering
 
 // - For Arduino: Connect the sensor to Digital I/O Pin 7.
 DHT11 dht11(7);
@@ -65,18 +65,18 @@ void loop() {
       pMoisture_old = pMoisture;
     } 
 
-    if (pMoisture < moistureThreshold || pMoisture > soilMax) {
+    if (pMoisture <= moistureThreshold || pMoisture > soilMax) {
       // LED Control: Watered too little - red
-      if (pMoisture < moistureThreshold) {
-        //  WiFiDrv::analogWrite(26, 0); // green off 
+      if (pMoisture <= moistureThreshold) {
+        WiFiDrv::analogWrite(26, 0); // green off 
         WiFiDrv::analogWrite(25, 255); // trun on red = water your plant
       } else {
         WiFiDrv::analogWrite(25, 0); // turn off red
       }
 
       // LED Control: Watered too much - blue
-      if (pMoisture > soilMax) {
-        // WiFiDrv::analogWrite(26, 0); // green off
+      if (pMoisture >= soilMax) {
+        WiFiDrv::analogWrite(26, 0); // green off
         WiFiDrv::analogWrite(27, 255); // trun on blue = STOP watering your plant
       } else {
         WiFiDrv::analogWrite(27, 0); // turn off blue
@@ -85,6 +85,6 @@ void loop() {
       WiFiDrv::analogWrite(26, 255); // green on
     }
     
-    delay(600000);
+    delay(2000);
 }
 
