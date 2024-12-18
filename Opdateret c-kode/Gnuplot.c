@@ -14,7 +14,7 @@ int main(void) {
     };
 
     // Open the CSV file
-    FILE *csvFile = fopen("plant_data1.csv", "r");
+    FILE *csvFile = fopen("plant_data.csv", "r");
     if (csvFile == NULL) {
         printf("Error opening CSV file");
         return 1;
